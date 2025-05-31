@@ -1,0 +1,108 @@
+# filepath: c:\Users\OFENTSE\Documents\cloud backup software\.github\workflows\test.yml
+name: Altaro Cloud Backup Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x]
+        mongodb-version: [5.0]
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      
+    - name: Set up Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: backend/package-lock.json
+        
+    - name: Install dependencies
+      run: cd backend && npm ci
+      
+    - name: Run unit tests
+      run: cd backend && npm run test:unit
+      
+    - name: Run integration tests
+      run: cd backend && npm run test:integration
+    
+    - name: Run E2E tests
+      run: cd backend && npm run test:e2e
+      
+    - name: Generate coverage report
+      run: cd backend && npm run test:coverage
+      
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        directory: ./backend/coverage
+        flags: backend
+        name: backend-coverage
+  
+  frontend-tests:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x]
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      
+    - name: Set up Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+        
+    - name: Install dependencies
+      run: cd frontend && npm ci
+      
+    - name: Run component and unit tests
+      run: cd frontend && npm test
+      
+    - name: Generate coverage report
+      run: cd frontend && npm test -- --coverage
+      
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        directory: ./frontend/coverage
+        flags: frontend
+        name: frontend-coverage
+
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '18.x'
+        
+    - name: Install backend dependencies
+      run: cd backend && npm ci
+      
+    - name: Lint backend
+      run: cd backend && npm run lint
+      
+    - name: Install frontend dependencies
+      run: cd frontend && npm ci
+      
+    - name: Lint frontend
+      run: cd frontend && npm run lint
