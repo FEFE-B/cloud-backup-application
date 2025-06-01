@@ -23,6 +23,23 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Add status endpoint for easier debugging
+app.get('/api/auth/status', (req, res) => {
+  res.json({
+    status: 'online',
+    server: 'simple-server',
+    timestamp: new Date().toISOString(),
+    usersCount: users.length,
+    endpoints: {
+      auth: {
+        login: '/api/auth/login',
+        register: '/api/auth/register',
+        me: '/api/auth/me'
+      }
+    }
+  });
+});
+
 // In-memory data store for testing
 const users = [
   {

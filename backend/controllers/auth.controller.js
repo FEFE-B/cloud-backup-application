@@ -66,6 +66,7 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log('Login attempt:', { email });
 
     // Validate email & password
     if (!email || !password) {
@@ -78,6 +79,7 @@ exports.login = async (req, res) => {
     // Check for user
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
+      console.log('User not found:', email);
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials'
@@ -86,6 +88,7 @@ exports.login = async (req, res) => {
 
     // Check if password matches
     const isMatch = await user.matchPassword(password);
+    console.log('Password match:', isMatch);
     if (!isMatch) {
       return res.status(401).json({
         success: false,
@@ -95,6 +98,7 @@ exports.login = async (req, res) => {
 
     // Generate token
     const token = user.getSignedJwtToken();
+    console.log('Login successful for:', email);
 
     res.status(200).json({
       success: true,
