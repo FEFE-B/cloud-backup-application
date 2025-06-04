@@ -1,4 +1,4 @@
-// Test connectivity to the backend
+// Fixed connectivity test script for Cloud Backup Software
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -30,13 +30,13 @@ app.get('/', (req, res) => {
       
       <div class="card">
         <h2>Test Simple Server (Port 5000)</h2>
-        <button onclick="testConnection('http://localhost:5000/api/auth/status')">Test Connection</button>
+        <button onclick="testConnection('http://localhost:5000/api/health')">Test Connection</button>
         <div id="result5000"></div>
       </div>
       
       <div class="card">
         <h2>Test Memory Server (Port 5001)</h2>
-        <button onclick="testConnection('http://localhost:5001/api/auth/status')">Test Connection</button>
+        <button onclick="testConnection('http://localhost:5001/api/health')">Test Connection</button>
         <div id="result5001"></div>
       </div>
       
@@ -47,7 +47,8 @@ app.get('/', (req, res) => {
         <div id="resultLogin5000"></div>
       </div>
 
-      <script>        async function testConnection(url) {
+      <script>
+        async function testConnection(url) {
           const resultId = url.includes('5000') ? 'result5000' : 'result5001';
           const resultElement = document.getElementById(resultId);
           
@@ -88,14 +89,14 @@ app.get('/', (req, res) => {
             });
             const endTime = new Date().getTime();
             const data = await response.json();
-              resultElement.innerHTML = 
+            
+            resultElement.innerHTML = 
               '<p class="success">✅ Login successful! (' + (endTime - startTime) + 'ms)</p>' +
               '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
           } catch (error) {
-            resultElement.innerHTML = `
-              <p class="error">❌ Login failed!</p>
-              <pre class="error">${error.message}</pre>
-            `;
+            resultElement.innerHTML = 
+              '<p class="error">❌ Login failed!</p>' +
+              '<pre class="error">' + error.message + '</pre>';
           }
         }
       </script>
@@ -104,23 +105,8 @@ app.get('/', (req, res) => {
   `);
 });
 
-// Add status endpoint for the main API
-app.get('/api/auth/status', (req, res) => {
-  res.json({
-    status: 'online',
-    server: 'connectivity-test',
-    timestamp: new Date().toISOString(),
-    endpoints: {
-      auth: {
-        login: '/api/auth/login',
-        register: '/api/auth/register'
-      }
-    }
-  });
-});
-
-// Start server on port 3003
-const PORT = 3003;
+const PORT = 3456;
 app.listen(PORT, () => {
   console.log(`Connectivity test server running at http://localhost:${PORT}`);
+  console.log('Press Ctrl+C to stop');
 });

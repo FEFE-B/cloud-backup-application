@@ -23,6 +23,7 @@ const backupRoutes = require('./routes/backup.routes');
 const renewalRoutes = require('./routes/renewal.routes');
 const userRoutes = require('./routes/user.routes');
 const adminRoutes = require('./routes/admin.routes');
+const errorRoutes = require('./routes/error.routes');
 
 // Database connection
 mongoose.connect(process.env.MONGO_URI, {
@@ -32,12 +33,24 @@ mongoose.connect(process.env.MONGO_URI, {
   .then(() => console.log('MongoDB Connected'))
   .catch(err => console.error('MongoDB Connection Error:', err));
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.status(200).json({
+    success: true,
+    status: 'Server is running',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    mongodb: 'Connected'
+  });
+});
+
 // Route middleware
 app.use('/api/auth', authRoutes);
 app.use('/api/backup', backupRoutes);
 app.use('/api/renewals', renewalRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/errors', errorRoutes);
 
 // Schedule renewal notification jobs
 const { checkForUpcomingRenewals } = require('./controllers/renewal.controller');

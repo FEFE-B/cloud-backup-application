@@ -19,7 +19,11 @@ app.use((req, res, next) => {
 });
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: '*',  // Allow all origins for testing
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -87,8 +91,7 @@ app.post('/api/auth/login', async (req, res) => {
     : password === user.password;
     
   console.log('Password match result:', isMatch);
-    
-  if (!isMatch) {
+      if (!isMatch) {
     console.log('Password mismatch - login failed');
     return res.status(401).json({ success: false, message: 'Invalid credentials' });
   }
@@ -99,6 +102,15 @@ app.post('/api/auth/login', async (req, res) => {
     process.env.JWT_SECRET || 'secret_jwt_key',
     { expiresIn: '1d' }
   );
+  
+  // Remove password from response
+  const { password: _, ...userWithoutPassword } = user;
+  
+  res.status(200).json({
+    success: true,
+    token,
+    user: userWithoutPassword
+  });
 
   // Remove password from response
   const { password: _, ...userWithoutPassword } = user;
@@ -294,16 +306,16 @@ app.get('/api/dashboard', authenticate, (req, res) => {
         name: 'Monthly Backup - Media',
         status: 'failed',
         lastRun: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
-      }
-    ]
+      }    ]
   };
-
+  
   res.status(200).json(mockData);
 });
 
-// Start the server
-const PORT = process.env.PORT || 5000;
-
+// Start server
+const PORT = process.env.PORT || 3030;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Simple server running on port ${PORT}`);
+  console.log(`Test user: admin@altaro.com / admin123`);
+});
 });
