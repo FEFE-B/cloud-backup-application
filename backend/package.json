@@ -4,7 +4,9 @@
   "description": "Backend for Altaro Cloud Backup Software with renewals functionality",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node production-server.js",
+    "start:dev": "node server.js",
+    "build": "echo 'No build required for Node.js backend'",
     "dev": "nodemon server.js",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -12,6 +14,10 @@
     "test:unit": "jest --testPathPattern=tests/unit",
     "test:integration": "jest --testPathPattern=tests/integration",
     "test:e2e": "jest --testPathPattern=tests/e2e"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
   },
   "dependencies": {
     "archiver": "^7.0.1",

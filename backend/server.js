@@ -7,13 +7,23 @@ const path = require('path');
 const cron = require('node-cron');
 
 // Load environment variables
-dotenv.config({ path: './config/.env' });
+if (process.env.NODE_ENV === 'production') {
+  dotenv.config({ path: './.env.production' });
+} else {
+  dotenv.config({ path: './config/.env' });
+}
 
 // Initialize Express
 const app = express();
 
 // Middleware
-app.use(cors());
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN || ['http://localhost:3000', 'https://social-media-platformsocial-media-platform-5bz8zhcpd.vercel.app'],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
