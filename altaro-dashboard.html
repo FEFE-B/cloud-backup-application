@@ -1,0 +1,66 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Altaro Cloud Backup Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .btn { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .status-success { color: #28a745; }
+        .status-error { color: #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1> Altaro Cloud Backup Dashboard</h1>
+            <p>Cloud backup management system - Demo Mode</p>
+        </div>
+        
+        <div class="dashboard">
+            <div class="card">
+                <h3> Backup Status</h3>
+                <p>Last Backup: <span class="status-success">2 hours ago</span></p>
+                <p>Next Scheduled: Tonight 2:00 AM</p>
+                <p>Total Backups: 156</p>
+                <p>Failed Backups: <span class="status-error">2</span></p>
+                <button class="btn">Start Backup Now</button>
+            </div>
+            
+            <div class="card">
+                <h3> Storage</h3>
+                <p>Used: 2.4 TB</p>
+                <p>Available: 5.6 TB</p>
+                <p>Compression: <span class="status-success">65%</span></p>
+                <button class="btn">View Details</button>
+            </div>
+            
+            <div class="card">
+                <h3> Recent Activities</h3>
+                <p>Server01: <span class="status-success">Completed</span></p>
+                <p>Database: <span class="status-success">Completed</span></p>
+                <p>VM-WIN2019: In Progress</p>
+                <p>File Server: <span class="status-error">Failed</span></p>
+            </div>
+            
+            <div class="card">
+                <h3> Quick Actions</h3>
+                <button class="btn">Restore Files</button>
+                <button class="btn">Schedule Backup</button>
+                <button class="btn">System Settings</button>
+                <button class="btn">View Logs</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        console.log('Altaro Dashboard loaded successfully!');
+        alert('Welcome to Altaro Cloud Backup Dashboard!\n\nThis is a demo interface showing:\n- Backup status\n- Storage information\n- Recent activities\n- Quick actions\n\nThe dashboard is now working properly!');
+    </script>
+</body>
+</html>

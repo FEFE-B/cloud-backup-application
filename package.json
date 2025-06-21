@@ -1,0 +1,17 @@
+﻿{
+  "name": "altaro-cloud-backup-dashboard",
+  "version": "1.0.0",
+  "description": "Altaro Cloud Backup Dashboard with integrated backend API",
+  "main": "production-server.js",
+  "scripts": {
+    "start": "node production-server.js",
+    "dev": "nodemon production-server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

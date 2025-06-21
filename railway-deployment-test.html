@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Railway Backend Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background: #d4edda; border-color: #c3e6cb; }
+        .error { background: #f8d7da; border-color: #f5c6cb; }
+        .warning { background: #fff3cd; border-color: #ffeaa7; }
+        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin: 5px; }
+        button:hover { background: #0056b3; }
+        #logs { background: #f8f9fa; padding: 10px; border-radius: 4px; font-family: monospace; white-space: pre-wrap; max-height: 400px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <h1>🚀 Railway Backend Deployment Test</h1>
+    
+    <div class="test-section">
+        <h2>Current Status</h2>
+        <p><strong>Local Backend:</strong> <span id="local-status">Testing...</span></p>
+        <p><strong>Production Backend:</strong> <span id="prod-status">Testing...</span></p>
+        <p><strong>Frontend Status:</strong> <span id="frontend-status">Testing...</span></p>
+    </div>
+
+    <div class="test-section">
+        <h2>Backend Tests</h2>
+        <button onclick="testLocalBackend()">Test Local Backend</button>
+        <button onclick="testProdBackend()">Test Production Backend</button>
+        <button onclick="testAuth()">Test Authentication</button>
+        <button onclick="runFullTest()">Run Full Test Suite</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Deployment Tools</h2>
+        <button onclick="showDeploymentGuide()">Show Deployment Guide</button>
+        <button onclick="generateEnvVars()">Generate Environment Variables</button>
+        <button onclick="testFrontendIntegration()">Test Frontend Integration</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="logs">Click a test button to see results...\n</div>
+    </div>
+
+    <script>
+        const LOCAL_API = 'http://localhost:5000';
+        const PROD_API = 'https://altaro-cloud-backup-production.up.railway.app';
+        const FRONTEND_URL = 'https://social-media-platform-app.netlify.app';
+
+        function log(message, type = 'info') {
+            const logs = document.getElementById('logs');
+            const timestamp = new Date().toLocaleTimeString();
+            const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️';
+            logs.textContent += `[${timestamp}] ${icon} ${message}\n`;
+            logs.scrollTop = logs.scrollHeight;
+        }
+
+        async function testEndpoint(url, method = 'GET', body = null) {
+            try {
+                const options = {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    mode: 'cors'
+                };
+                if (body) options.body = JSON.stringify(body);
+
+                const response = await fetch(url, options);
+                const data = await response.json();
+                
+                return {
+                    success: response.ok,
+                    status: response.status,
+                    data: data
+                };
+            } catch (error) {
+                return {
+                    success: false,
+                    error: error.message
+                };
+            }
+        }
+
+        async function testLocalBackend() {
+            log('Testing local backend...', 'info');
+            
+            const healthResult = await testEndpoint(`${LOCAL_API}/health`);
+            if (healthResult.success) {
+                log(`Local backend health: OK (${healthResult.data.status})`, 'success');
+                document.getElementById('local-status').textContent = '✅ Running';
+                document.getElementById('local-status').parentElement.className = 'success';
+            } else {
+                log(`Local backend health: FAILED (${healthResult.error || healthResult.status})`, 'error');
+                document.getElementById('local-status').textContent = '❌ Down';
+                document.getElementById('local-status').parentElement.className = 'error';
+            }
+        }
+
+        async function testProdBackend() {
+            log('Testing production backend...', 'info');
+            
+            const healthResult = await testEndpoint(`${PROD_API}/health`);
+            if (healthResult.success) {
+                log(`Production backend health: OK (${healthResult.data.status})`, 'success');
+                document.getElementById('prod-status').textContent = '✅ Running';
+                document.getElementById('prod-status').parentElement.className = 'success';
+            } else {
+                log(`Production backend health: FAILED (${healthResult.error || healthResult.status})`, 'error');
+                document.getElementById('prod-status').textContent = '❌ Down';
+                document.getElementById('prod-status').parentElement.className = 'error';
+            }
+        }
+
+        async function testAuth() {
+            log('Testing authentication...', 'info');
+            
+            const credentials = {
+                email: 'admin@altaro.com',
+                password: 'admin123'
+            };
+
+            // Test local auth
+            const localAuth = await testEndpoint(`${LOCAL_API}/api/auth/login`, 'POST', credentials);
+            if (localAuth.success) {
+                log('Local authentication: SUCCESS', 'success');
+            } else {
+                log(`Local authentication: FAILED (${localAuth.error || localAuth.status})`, 'error');
+            }
+
+            // Test production auth
+            const prodAuth = await testEndpoint(`${PROD_API}/api/auth/login`, 'POST', credentials);
+            if (prodAuth.success) {
+                log('Production authentication: SUCCESS', 'success');
+            } else {
+                log(`Production authentication: FAILED (${prodAuth.error || prodAuth.status})`, 'error');
+            }
+        }
+
+        async function runFullTest() {
+            log('Running full test suite...', 'info');
+            log('=====================================', 'info');
+            
+            await testLocalBackend();
+            await testProdBackend();
+            await testAuth();
+            
+            // Test frontend
+            try {
+                const frontendResponse = await fetch(FRONTEND_URL);
+                if (frontendResponse.ok) {
+                    log('Frontend accessibility: OK', 'success');
+                    document.getElementById('frontend-status').textContent = '✅ Online';
+                } else {
+                    log('Frontend accessibility: FAILED', 'error');
+                    document.getElementById('frontend-status').textContent = '❌ Offline';
+                }
+            } catch (error) {
+                log(`Frontend accessibility: ERROR (${error.message})`, 'error');
+                document.getElementById('frontend-status').textContent = '❌ Error';
+            }
+            
+            log('=====================================', 'info');
+            log('Full test suite completed!', 'success');
+        }
+
+        function showDeploymentGuide() {
+            log('=== RAILWAY DEPLOYMENT GUIDE ===', 'info');
+            log('1. Go to https://railway.app', 'info');
+            log('2. Login with GitHub account', 'info');
+            log('3. Click "New Project" > "Deploy from GitHub repo"', 'info');
+            log('4. Select your repository', 'info');
+            log('5. Choose /backend as root directory', 'info');
+            log('6. Set environment variables (see next test)', 'info');
+            log('7. Deploy and get your Railway URL', 'info');
+            log('8. Update frontend to use new backend URL', 'info');
+            log('================================', 'info');
+        }
+
+        function generateEnvVars() {
+            log('=== RAILWAY ENVIRONMENT VARIABLES ===', 'info');
+            log('Copy these to Railway dashboard:', 'info');
+            log('NODE_ENV=production', 'info');
+            log('JWT_SECRET=railway_production_jwt_secret_12345', 'info');
+            log('CORS_ORIGIN=https://social-media-platform-app.netlify.app', 'info');
+            log('=======================================', 'info');
+        }
+
+        async function testFrontendIntegration() {
+            log('Testing frontend integration...', 'info');
+            
+            // This would normally test the frontend's ability to connect to backend
+            log('Frontend URL: ' + FRONTEND_URL, 'info');
+            log('Expected Backend URL: ' + PROD_API, 'info');
+            log('Local Backend URL: ' + LOCAL_API, 'info');
+            
+            log('To test integration:', 'warning');
+            log('1. Open frontend in browser', 'warning');
+            log('2. Check browser console for API calls', 'warning');
+            log('3. Try logging in with admin@altaro.com / admin123', 'warning');
+        }
+
+        // Run initial tests
+        window.addEventListener('load', () => {
+            log('Railway Backend Test initialized', 'success');
+            log('Ready to test deployment...', 'info');
+            
+            // Auto-run basic tests
+            setTimeout(runFullTest, 1000);
+        });
+    </script>
+</body>
+</html>

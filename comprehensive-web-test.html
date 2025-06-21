@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Web Application Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-results {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        .loading { opacity: 0.6; }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .metric {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .metric-label {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Comprehensive Web Application Test</h1>
+    <p><strong>Target URL:</strong> <a href="https://social-media-platform-app.netlify.app/#/login" target="_blank">https://social-media-platform-app.netlify.app/#/login</a></p>
+    
+    <div class="test-section">
+        <h2>1. Basic Site Accessibility</h2>
+        <button onclick="testBasicAccessibility()">Run Accessibility Tests</button>
+        <div id="accessibility-results"></div>
+        
+        <div class="metrics" id="performance-metrics" style="display: none;">
+            <div class="metric">
+                <div class="metric-value" id="load-time">-</div>
+                <div class="metric-label">Load Time (ms)</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value" id="response-code">-</div>
+                <div class="metric-label">Response Code</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value" id="page-size">-</div>
+                <div class="metric-label">Page Size (KB)</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Login Functionality Test</h2>
+        <button onclick="testLoginFunctionality()">Test Login Form</button>
+        <div id="login-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Navigation & Core Features</h2>
+        <button onclick="testNavigation()">Test Navigation</button>
+        <div id="navigation-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Performance & Console Errors</h2>
+        <button onclick="testPerformance()">Run Performance Tests</button>
+        <div id="performance-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>5. Mobile Responsiveness</h2>
+        <button onclick="testResponsiveness()">Test Mobile View</button>
+        <div id="responsive-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>6. Live Site Preview</h2>
+        <button onclick="loadSitePreview()">Load Site in Frame</button>
+        <div id="iframe-container"></div>
+    </div>
+
+    <script>
+        const TARGET_URL = 'https://social-media-platform-app.netlify.app/#/login';
+        const BASE_URL = 'https://social-media-platform-app.netlify.app';
+        
+        function logResult(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = `test-results ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+            container.appendChild(div);
+        }
+
+        async function testBasicAccessibility() {
+            const container = document.getElementById('accessibility-results');
+            container.innerHTML = '';
+            
+            logResult('accessibility-results', 'Starting basic accessibility tests...', 'info');
+            
+            try {
+                // Test 1: Basic fetch test
+                const startTime = performance.now();
+                const response = await fetch(TARGET_URL, { 
+                    method: 'HEAD',
+                    mode: 'no-cors'
+                });
+                const endTime = performance.now();
+                const loadTime = Math.round(endTime - startTime);
+                
+                document.getElementById('load-time').textContent = loadTime;
+                document.getElementById('response-code').textContent = 'CORS';
+                document.getElementById('performance-metrics').style.display = 'block';
+                
+                logResult('accessibility-results', `Site responds to requests (Load time: ${loadTime}ms)`, 'success');
+                
+                // Test 2: Check if site loads in iframe (CORS permitting)
+                const iframe = document.createElement('iframe');
+                iframe.src = TARGET_URL;
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+                
+                iframe.onload = () => {
+                    logResult('accessibility-results', 'Site loads successfully in iframe', 'success');
+                    document.body.removeChild(iframe);
+                };
+                
+                iframe.onerror = () => {
+                    logResult('accessibility-results', 'Site failed to load in iframe (possible CORS restriction)', 'warning');
+                    document.body.removeChild(iframe);
+                };
+                
+                // Test 3: Check different paths
+                const paths = ['/', '/login', '/dashboard', '/diagnostics'];
+                for (const path of paths) {
+                    try {
+                        await fetch(BASE_URL + path, { method: 'HEAD', mode: 'no-cors' });
+                        logResult('accessibility-results', `Path "${path}" is accessible`, 'success');
+                    } catch (error) {
+                        logResult('accessibility-results', `Path "${path}" may not be accessible: ${error.message}`, 'warning');
+                    }
+                }
+                
+            } catch (error) {
+                logResult('accessibility-results', `Accessibility test failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testLoginFunctionality() {
+            const container = document.getElementById('login-results');
+            container.innerHTML = '';
+            
+            logResult('login-results', 'Testing login functionality...', 'info');
+            
+            // Since we can't directly interact with the form due to CORS, we'll test the endpoints
+            const tests = [
+                {
+                    name: 'Login endpoint availability',
+                    url: 'https://altaro-cloud-backup-production.up.railway.app/api/auth/login',
+                    method: 'POST'
+                },
+                {
+                    name: 'Register endpoint availability', 
+                    url: 'https://altaro-cloud-backup-production.up.railway.app/api/auth/register',
+                    method: 'POST'
+                },
+                {
+                    name: 'Health check',
+                    url: 'https://altaro-cloud-backup-production.up.railway.app/health',
+                    method: 'GET'
+                }
+            ];
+            
+            for (const test of tests) {
+                try {
+                    const response = await fetch(test.url, { 
+                        method: test.method,
+                        mode: 'cors',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        logResult('login-results', `✅ ${test.name}: Server responding (${response.status})`, 'success');
+                    } else {
+                        logResult('login-results', `⚠️ ${test.name}: Server responded with ${response.status}`, 'warning');
+                    }
+                } catch (error) {
+                    logResult('login-results', `❌ ${test.name}: ${error.message}`, 'error');
+                }
+            }
+            
+            // Test form validation by checking if the page has required elements
+            logResult('login-results', 'Note: Direct form interaction testing requires same-origin access', 'info');
+        }
+
+        async function testNavigation() {
+            const container = document.getElementById('navigation-results');
+            container.innerHTML = '';
+            
+            logResult('navigation-results', 'Testing navigation and routing...', 'info');
+            
+            const routes = [
+                '/#/login',
+                '/#/dashboard', 
+                '/#/register',
+                '/diagnostics',
+                '/comprehensive-diagnostics',
+                '/api-dashboard'
+            ];
+            
+            for (const route of routes) {
+                try {
+                    const fullUrl = BASE_URL + route;
+                    const response = await fetch(fullUrl, { method: 'HEAD', mode: 'no-cors' });
+                    logResult('navigation-results', `Route "${route}" is accessible`, 'success');
+                } catch (error) {
+                    logResult('navigation-results', `Route "${route}" test failed: ${error.message}`, 'warning');
+                }
+            }
+        }
+
+        async function testPerformance() {
+            const container = document.getElementById('performance-results');
+            container.innerHTML = '';
+            
+            logResult('performance-results', 'Running performance tests...', 'info');
+            
+            try {
+                // Test multiple requests to measure consistency
+                const times = [];
+                for (let i = 0; i < 5; i++) {
+                    const start = performance.now();
+                    await fetch(TARGET_URL, { method: 'HEAD', mode: 'no-cors' });
+                    const end = performance.now();
+                    times.push(end - start);
+                }
+                
+                const avgTime = times.reduce((a, b) => a + b, 0) / times.length;
+                const minTime = Math.min(...times);
+                const maxTime = Math.max(...times);
+                
+                logResult('performance-results', `Average response time: ${avgTime.toFixed(2)}ms`, 'info');
+                logResult('performance-results', `Min response time: ${minTime.toFixed(2)}ms`, 'success');
+                logResult('performance-results', `Max response time: ${maxTime.toFixed(2)}ms`, maxTime > 3000 ? 'warning' : 'success');
+                
+                // Test concurrent requests
+                const concurrentStart = performance.now();
+                const concurrent = await Promise.all([
+                    fetch(BASE_URL, { method: 'HEAD', mode: 'no-cors' }),
+                    fetch(BASE_URL + '/diagnostics', { method: 'HEAD', mode: 'no-cors' }),
+                    fetch(BASE_URL + '/comprehensive-diagnostics', { method: 'HEAD', mode: 'no-cors' })
+                ]);
+                const concurrentEnd = performance.now();
+                
+                logResult('performance-results', `Concurrent requests completed in: ${(concurrentEnd - concurrentStart).toFixed(2)}ms`, 'success');
+                
+            } catch (error) {
+                logResult('performance-results', `Performance test failed: ${error.message}`, 'error');
+            }
+        }
+
+        function testResponsiveness() {
+            const container = document.getElementById('responsive-results');
+            container.innerHTML = '';
+            
+            logResult('responsive-results', 'Testing mobile responsiveness...', 'info');
+            
+            // Create responsive test iframe
+            const iframe = document.createElement('iframe');
+            iframe.src = TARGET_URL;
+            iframe.style.width = '375px'; // Mobile width
+            iframe.style.height = '667px'; // Mobile height
+            iframe.style.border = '1px solid #ddd';
+            iframe.style.borderRadius = '4px';
+            
+            const mobileContainer = document.createElement('div');
+            mobileContainer.innerHTML = '<h4>Mobile View (375x667px):</h4>';
+            mobileContainer.appendChild(iframe);
+            container.appendChild(mobileContainer);
+            
+            iframe.onload = () => {
+                logResult('responsive-results', 'Site loads in mobile viewport', 'success');
+            };
+            
+            iframe.onerror = () => {
+                logResult('responsive-results', 'Site failed to load in mobile viewport', 'error');
+            };
+            
+            // Test different viewport sizes
+            const viewports = [
+                { name: 'Mobile', width: '375px', height: '667px' },
+                { name: 'Tablet', width: '768px', height: '1024px' },
+                { name: 'Desktop', width: '1920px', height: '1080px' }
+            ];
+            
+            viewports.forEach(viewport => {
+                logResult('responsive-results', `Testing ${viewport.name} viewport (${viewport.width} x ${viewport.height})`, 'info');
+            });
+        }
+
+        function loadSitePreview() {
+            const container = document.getElementById('iframe-container');
+            container.innerHTML = '';
+            
+            const iframe = document.createElement('iframe');
+            iframe.src = TARGET_URL;
+            iframe.style.width = '100%';
+            iframe.style.height = '600px';
+            iframe.style.border = '1px solid #ddd';
+            iframe.style.borderRadius = '4px';
+            
+            container.appendChild(iframe);
+            
+            iframe.onload = () => {
+                console.log('Site loaded in preview iframe');
+            };
+            
+            iframe.onerror = () => {
+                container.innerHTML = '<div class="test-results error">Failed to load site in iframe. This may be due to CORS restrictions.</div>';
+            };
+        }
+
+        // Auto-run basic tests on page load
+        window.addEventListener('load', () => {
+            console.log('Page loaded, ready for testing');
+        });
+    </script>
+</body>
+</html>
